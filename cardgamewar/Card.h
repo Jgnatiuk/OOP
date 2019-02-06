@@ -20,7 +20,7 @@ public:
     const rank get_rank() { return rank; }
     const suit get_suit() { return suit; }
 
-
+private:
     suit suit;
     rank rank;
 
