@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <time.h>
+#include "snakeObjects.h"
 using namespace sf;
 
 int N = 30, M = 20;
@@ -9,19 +10,16 @@ int h = size * M;
 
 int dir, num = 4;
 
-struct Snake
-{
-  int x, y;
-} s[100];
+// Declare snake object
+Snake s[100];
 
-struct Fruct
-{
-  int x, y;
-} f;
+// Declare fruit object
+Fruit f;
 
 void
 Tick()
 {
+
   for (int i = num; i > 0; --i) {
     s[i].x = s[i - 1].x;
     s[i].y = s[i - 1].y;
@@ -40,6 +38,7 @@ Tick()
     num++;
     f.x = rand() % N;
     f.y = rand() % M;
+    f.fruitTimer = 0;
   }
 
   if (s[0].x > N)
@@ -54,6 +53,17 @@ Tick()
   for (int i = 1; i < num; i++)
     if (s[0].x == s[i].x && s[0].y == s[i].y)
       num = i;
+
+  // Increment fruit timer
+  f.fruitTimer += 1;
+
+  // If fruit has not been obtained in 5 seconds, regenerate fruit
+  if(f.fruitTimer == 50)
+  {
+    f.x = rand() % N;
+    f.y = rand() % M;
+    f.fruitTimer = 0;
+  }
 }
 
 int
@@ -63,12 +73,15 @@ main()
 
   RenderWindow window(VideoMode(w, h), "Snake Game!");
 
-  Texture t1, t2;
+  Texture t1, t2, t3;
   t1.loadFromFile("images/white.png");
   t2.loadFromFile("images/red.png");
+  t3.loadFromFile("images/green.png");
 
   Sprite sprite1(t1);
   Sprite sprite2(t2);
+  Sprite sprite3(t3);
+
 
   Clock clock;
   float timer = 0, delay = 0.1;
@@ -104,19 +117,22 @@ main()
     ////// draw  ///////
     window.clear();
 
+    ///// draw playing area /////
     for (int i = 0; i < N; i++)
       for (int j = 0; j < M; j++) {
         sprite1.setPosition(i * size, j * size);
         window.draw(sprite1);
       }
 
+    ///// draw snake /////
     for (int i = 0; i < num; i++) {
       sprite2.setPosition(s[i].x * size, s[i].y * size);
       window.draw(sprite2);
     }
 
-    sprite2.setPosition(f.x * size, f.y * size);
-    window.draw(sprite2);
+    ///// draw fruit /////
+    sprite3.setPosition(f.x * size, f.y * size);
+    window.draw(sprite3);
 
     window.display();
   }
